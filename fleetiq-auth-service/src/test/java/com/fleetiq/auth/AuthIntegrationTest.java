@@ -22,6 +22,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +66,7 @@ public class AuthIntegrationTest extends AbstractIntegrationTest {
                     p.setName("Enterprise");
                     p.setCode("ENTERPRISE");
                     p.setTier("ENTERPRISE");
-                    p.setPricePerVehicleMonthly(349.00);
+                    p.setPricePerVehicleMonthly(BigDecimal.valueOf(349.00));
                     p.setMaxVehicles(null);
                     p.setMaxUsers(null);
                     p.setActive(true);
