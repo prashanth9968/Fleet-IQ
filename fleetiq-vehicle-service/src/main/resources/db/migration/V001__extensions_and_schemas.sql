@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
 -- Enable partition management and scheduling extensions
 CREATE SCHEMA IF NOT EXISTS partman;
 CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
-CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- Reusable trigger function for updated_at
 CREATE OR REPLACE FUNCTION fn_set_updated_at()
