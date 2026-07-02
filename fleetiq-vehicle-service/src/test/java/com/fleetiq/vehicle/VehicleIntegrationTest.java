@@ -265,11 +265,11 @@ public class VehicleIntegrationTest extends AbstractIntegrationTest {
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         // Step 7: Verify it is no longer retrievable (should return 404)
-        ResponseEntity<ProblemDetails> getResponseAfterDelete = restTemplate.exchange(
+        ResponseEntity<ProblemDetail> getResponseAfterDelete = restTemplate.exchange(
                 "/api/v1/vehicles/" + vehicleId,
                 HttpMethod.GET,
                 getEntity,
-                ProblemDetails.class
+                ProblemDetail.class
         );
         assertThat(getResponseAfterDelete.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
