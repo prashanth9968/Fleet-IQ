@@ -22,8 +22,7 @@ spring:
         format_sql: true
     show-sql: false
   
-  flyway:
-    enabled: true
+  flyway:\n    enabled: false
     baseline-on-migrate: true
     locations: classpath:db/migration
 
@@ -66,3 +65,4 @@ management:
     export:
       prometheus:
         enabled: true
+
