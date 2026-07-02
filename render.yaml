@@ -1,0 +1,63 @@
+services:
+  # -----------------------------------------------------
+  # Core Infrastructure Services
+  # -----------------------------------------------------
+  - type: web
+    name: fleetiq-auth-service
+    env: docker
+    dockerContext: fleetiq-auth-service
+    dockerfilePath: fleetiq-auth-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false # User needs to enter the Neon Postgres URL in the dashboard
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+  - type: web
+    name: fleetiq-vehicle-service
+    env: docker
+    dockerContext: fleetiq-vehicle-service
+    dockerfilePath: fleetiq-vehicle-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+  - type: web
+    name: fleetiq-driver-service
+    env: docker
+    dockerContext: fleetiq-driver-service
+    dockerfilePath: fleetiq-driver-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+  # -----------------------------------------------------
+  # API Gateway (Unifies all the services)
+  # -----------------------------------------------------
+  - type: web
+    name: fleetiq-api-gateway
+    env: docker
+    dockerContext: fleetiq-api-gateway
+    dockerfilePath: fleetiq-api-gateway/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: AUTH_SERVICE_URL
+        value: https://fleetiq-auth-service.onrender.com
+      - key: VEHICLE_SERVICE_URL
+        value: https://fleetiq-vehicle-service.onrender.com
+      - key: DRIVER_SERVICE_URL
+        value: https://fleetiq-driver-service.onrender.com
+      # (Note: Tracking, Fuel, Alerts, Health, and Analytics can be added here once deployed)
