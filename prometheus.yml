@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'fleetiq-services'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+        - 'api-gateway:8080'
+        - 'auth-service:8081'
+        - 'vehicle-service:8082'
+        - 'device-gateway:8083'
+        - 'tracking-service:8084'
+        - 'fuel-service:8084'
+        - 'alerts-service:8085'
+        - 'driver-service:8086'
+        - 'health-service:8087'
+        - 'analytics-service:8088'

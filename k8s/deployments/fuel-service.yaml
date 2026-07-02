@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetiq-fuel-service
+  labels:
+    app: fleetiq-fuel-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fleetiq-fuel-service
+  template:
+    metadata:
+      labels:
+        app: fleetiq-fuel-service
+    spec:
+      containers:
+      - name: fuel-service
+        image: fleetiq/fleetiq-fuel-service:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: fleetiq-config
+        - secretRef:
+            name: fleetiq-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fuel-service
+spec:
+  selector:
+    app: fleetiq-fuel-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

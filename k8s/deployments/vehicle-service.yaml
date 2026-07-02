@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetiq-vehicle-service
+  labels:
+    app: fleetiq-vehicle-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fleetiq-vehicle-service
+  template:
+    metadata:
+      labels:
+        app: fleetiq-vehicle-service
+    spec:
+      containers:
+      - name: vehicle-service
+        image: fleetiq/fleetiq-vehicle-service:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: fleetiq-config
+        - secretRef:
+            name: fleetiq-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicle-service
+spec:
+  selector:
+    app: fleetiq-vehicle-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

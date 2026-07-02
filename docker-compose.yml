@@ -1,0 +1,200 @@
+version: '3.8'
+
+services:
+  # ---------------- Infrastructure ---------------- #
+  postgres:
+    image: timescale/timescaledb-ha:pg14-latest
+    environment:
+      POSTGRES_DB: fleetiq
+      POSTGRES_USER: fleetiq
+      POSTGRES_PASSWORD: fleetiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fleetiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  # ---------------- API Gateway ---------------- #
+  api-gateway:
+    build: ./fleetiq-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8081
+      VEHICLE_SERVICE_URL: http://vehicle-service:8082
+      TRACKING_SERVICE_URL: http://tracking-service:8084
+      FUEL_SERVICE_URL: http://fuel-service:8084
+      ALERTS_SERVICE_URL: http://alerts-service:8085
+      DRIVER_SERVICE_URL: http://driver-service:8086
+      HEALTH_SERVICE_URL: http://health-service:8087
+      ANALYTICS_SERVICE_URL: http://analytics-service:8088
+    depends_on:
+      - auth-service
+      - vehicle-service
+
+  # ---------------- Microservices ---------------- #
+  auth-service:
+    build: ./fleetiq-auth-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  vehicle-service:
+    build: ./fleetiq-vehicle-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  device-gateway:
+    build: ./fleetiq-device-gateway-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  tracking-service:
+    build: ./fleetiq-tracking-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  fuel-service:
+    build: ./fleetiq-fuel-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  alerts-service:
+    build: ./fleetiq-alerts-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  driver-service:
+    build: ./fleetiq-driver-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  health-service:
+    build: ./fleetiq-vehicle-health-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  analytics-service:
+    build: ./fleetiq-analytics-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fleetiq
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ---------------- Frontend ---------------- #
+  admin-dashboard:
+    build: ./fleetiq-admin-dashboard
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+
+  # ---------------- Observability ---------------- #
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
+  redis_data:

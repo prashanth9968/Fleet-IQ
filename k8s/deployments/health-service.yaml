@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetiq-health-service
+  labels:
+    app: fleetiq-health-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fleetiq-health-service
+  template:
+    metadata:
+      labels:
+        app: fleetiq-health-service
+    spec:
+      containers:
+      - name: health-service
+        image: fleetiq/fleetiq-health-service:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: fleetiq-config
+        - secretRef:
+            name: fleetiq-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-service
+spec:
+  selector:
+    app: fleetiq-health-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

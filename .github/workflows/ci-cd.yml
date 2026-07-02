@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [
+          'fleetiq-auth-service',
+          'fleetiq-vehicle-service',
+          'fleetiq-device-gateway-service',
+          'fleetiq-tracking-service',
+          'fleetiq-fuel-service',
+          'fleetiq-alerts-service',
+          'fleetiq-driver-service',
+          'fleetiq-vehicle-health-service',
+          'fleetiq-analytics-service',
+          'fleetiq-api-gateway'
+        ]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+          
+      - name: Build with Maven
+        run: |
+          cd ${{ matrix.service }}
+          mvn clean package -DskipTests
+          
+      - name: Run Tests
+        run: |
+          cd ${{ matrix.service }}
+          mvn test
+          
+      - name: Build Docker Image
+        run: |
+          cd ${{ matrix.service }}
+          docker build -t fleetiq/${{ matrix.service }}:${{ github.sha }} .
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build React Dashboard Docker Image
+        run: |
+          cd fleetiq-admin-dashboard
+          docker build -t fleetiq/admin-dashboard:${{ github.sha }} .
+          
+  # Optional deployment job can be added here for Render / Koyeb
+  # deploy:
+  #   needs: [build-and-test, build-frontend]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Trigger Render Deploy Hook
+  #       run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
