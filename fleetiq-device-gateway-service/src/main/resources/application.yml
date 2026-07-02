@@ -1,0 +1,51 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: fleetiq-device-gateway-service
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        acks: all
+        retries: 3
+
+app:
+  mqtt:
+    broker-url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+    client-id: ${MQTT_CLIENT_ID:fleetiq-gateway-service}
+    topic: ${MQTT_TOPIC:telemetry/#}
+  
+  auth-service:
+    url: ${AUTH_SERVICE_URL:http://localhost:8081}
+
+# Logging configuration (conforming to engineering standards)
+logging:
+  level:
+    root: INFO
+    com.fleetiq.gateway: DEBUG
+    org.springframework.integration: INFO
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [Trace:%X{traceId}] - %msg%n"
+
+# Micrometer Actuator Metrics Config
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
