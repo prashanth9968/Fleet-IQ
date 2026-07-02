@@ -1,4 +1,7 @@
 -- V001__extensions_and_schemas.sql
+-- FleetIQ Fleet Management Platform
+-- Target: PostgreSQL 16 + TimescaleDB 2.x + PostGIS 3.x
+
 -- Enable core extensions in public schema
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -34,4 +37,7 @@ BEGIN
     RETURN result;
 END;
 $$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION fn_set_updated_at() IS 'Trigger function to automatically set updated_at column to NOW() on UPDATE';
+COMMENT ON FUNCTION fn_generate_short_id() IS 'Generates a random 8-character alphanumeric ID for user/short codes';
 
