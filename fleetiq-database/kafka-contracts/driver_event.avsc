@@ -1,0 +1,93 @@
+{
+  "type": "record",
+  "name": "DriverEvent",
+  "namespace": "com.fleetiq.events.driver",
+  "doc": "Driver safety violation event indicating high-g acceleration, cornering, or distracted behavior. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this driver event"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the vehicle involved"
+    },
+    {
+      "name": "driverId",
+      "type": "string",
+      "doc": "Unique UUID of the driver who committed the violation"
+    },
+    {
+      "name": "eventType",
+      "type": {
+        "type": "enum",
+        "name": "DriverSafetyViolationType",
+        "symbols": ["HARSH_ACCELERATION", "HARSH_BRAKING", "HARSH_CORNERING", "SPEEDING", "FATIGUE", "SEATBELT_VIOLATION", "PHONE_USE"]
+      },
+      "doc": "Classification type of the safety exception"
+    },
+    {
+      "name": "eventAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the violation occurred"
+    },
+    {
+      "name": "latitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Latitude coordinate of the violation"
+    },
+    {
+      "name": "longitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Longitude coordinate of the violation"
+    },
+    {
+      "name": "speedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vehicle speed during violation"
+    },
+    {
+      "name": "speedLimitKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Posted speed limit of the road if known"
+    },
+    {
+      "name": "magnitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Acceleration force magnitude measured in Gs"
+    },
+    {
+      "name": "durationSeconds",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Duration of the violation in seconds"
+    },
+    {
+      "name": "tripId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the trip segment active during violation"
+    },
+    {
+      "name": "roadName",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Street name where the event took place"
+    }
+  ]
+}

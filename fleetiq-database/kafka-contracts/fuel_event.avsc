@@ -1,0 +1,105 @@
+{
+  "type": "record",
+  "name": "FuelEvent",
+  "namespace": "com.fleetiq.events.fuel",
+  "doc": "Fuel level event representing periodic tank levels or detected anomalies (refuels, fuel thefts). Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this fuel event instance"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the vehicle"
+    },
+    {
+      "name": "deviceId",
+      "type": "string",
+      "doc": "Unique UUID of the hardware sensor device"
+    },
+    {
+      "name": "eventType",
+      "type": {
+        "type": "enum",
+        "name": "FuelEventType",
+        "symbols": ["READING", "FILL", "THEFT_SUSPECTED", "DRAIN", "CONSUMPTION_ALERT"]
+      },
+      "doc": "Type of event: periodic level check, refuel transaction, theft event, or high fuel usage alert"
+    },
+    {
+      "name": "recordedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the fuel level was captured"
+    },
+    {
+      "name": "fuelLevelLitres",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Absolute fuel level in litres"
+    },
+    {
+      "name": "fuelLevelPct",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Fuel level as a percentage of tank capacity"
+    },
+    {
+      "name": "consumptionRateLpm",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Measured engine consumption rate in Litres Per Minute"
+    },
+    {
+      "name": "fuelLevelBeforeLitres",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Fuel level prior to the fill/theft event"
+    },
+    {
+      "name": "fuelLevelAfterLitres",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Fuel level after the fill/theft event"
+    },
+    {
+      "name": "volumeLitres",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Volume delta of fuel refueled or siphoned/stolen"
+    },
+    {
+      "name": "confidenceScore",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Confidence rating (0.00 to 100.00) indicating certainty of theft alert"
+    },
+    {
+      "name": "ignition",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Ignition switch state during recording"
+    },
+    {
+      "name": "speedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vehicle speed in km/h at time of event"
+    },
+    {
+      "name": "engineRpm",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Engine RPM value"
+    }
+  ]
+}

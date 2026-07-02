@@ -1,0 +1,97 @@
+{
+  "type": "record",
+  "name": "NotificationEvent",
+  "namespace": "com.fleetiq.events.notification",
+  "doc": "Outbound message dispatch events and delivery receipts. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this specific event packet"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "alertId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the alert that triggered this notification"
+    },
+    {
+      "name": "notificationId",
+      "type": "string",
+      "doc": "Unique UUID of the notification log entry"
+    },
+    {
+      "name": "recipientUserId",
+      "type": "string",
+      "doc": "Unique UUID of the target user recipient"
+    },
+    {
+      "name": "channel",
+      "type": {
+        "type": "enum",
+        "name": "NotificationChannelType",
+        "symbols": ["PUSH", "SMS", "EMAIL", "WHATSAPP", "WEBHOOK"]
+      },
+      "doc": "Dispatch communication channel"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "doc": "Header or subject line of the notification"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "doc": "Main message text content"
+    },
+    {
+      "name": "deepLink",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Application redirect URL for the recipient"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "NotificationDeliveryState",
+        "symbols": ["PENDING", "SENT", "DELIVERED", "FAILED", "BOUNCED"]
+      },
+      "doc": "Delivery status of the message"
+    },
+    {
+      "name": "providerMessageId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Third party gateway message identifier (e.g. AWS SES, Twilio SID)"
+    },
+    {
+      "name": "failureReason",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Error message if delivery status is FAILED or BOUNCED"
+    },
+    {
+      "name": "sentAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the message was sent to the gateway provider"
+    },
+    {
+      "name": "deliveredAt",
+      "type": ["null", {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }],
+      "default": null,
+      "doc": "Timestamp when delivery receipt was received from the gateway provider"
+    }
+  ]
+}

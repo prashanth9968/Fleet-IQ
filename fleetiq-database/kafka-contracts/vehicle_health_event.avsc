@@ -1,0 +1,110 @@
+{
+  "type": "record",
+  "name": "VehicleHealthEvent",
+  "namespace": "com.fleetiq.events.health",
+  "doc": "Vehicle OBD-II diagnostic measurements and active DTC fault codes. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this vehicle health event instance"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the vehicle"
+    },
+    {
+      "name": "deviceId",
+      "type": "string",
+      "doc": "Unique UUID of the OBD dongle or tracker"
+    },
+    {
+      "name": "recordedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the engine parameters were recorded"
+    },
+    {
+      "name": "engineRpm",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Engine rotational speed in RPM"
+    },
+    {
+      "name": "coolantTempC",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Engine coolant temperature in degrees Celsius"
+    },
+    {
+      "name": "oilPressureKpa",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Engine oil pressure in kilopascals"
+    },
+    {
+      "name": "batteryVoltage",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Battery electrical voltage"
+    },
+    {
+      "name": "intakeAirTempC",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Intake air temperature in degrees Celsius"
+    },
+    {
+      "name": "throttlePositionPct",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Throttle plate opening percentage"
+    },
+    {
+      "name": "engineLoadPct",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Calculated engine load percentage"
+    },
+    {
+      "name": "odometerKm",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Current vehicle odometer reading in kilometers"
+    },
+    {
+      "name": "engineRunHours",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Total engine operating hours"
+    },
+    {
+      "name": "checkEngineLight",
+      "type": "boolean",
+      "default": false,
+      "doc": "Indicates if the Malfunction Indicator Lamp (MIL) check engine light is active"
+    },
+    {
+      "name": "activeDtcCodes",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "doc": "Array of standard OBD-II trouble codes currently active (e.g. ['P0301', 'P0171'])"
+    },
+    {
+      "name": "healthScore",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Current overall calculated health score (0-100)"
+    }
+  ]
+}

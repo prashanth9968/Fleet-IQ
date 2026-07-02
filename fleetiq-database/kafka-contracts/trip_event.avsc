@@ -1,0 +1,138 @@
+{
+  "type": "record",
+  "name": "TripEvent",
+  "namespace": "com.fleetiq.events.trip",
+  "doc": "Trip lifecycle status change or periodic mileage updates. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this specific trip event packet"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the vehicle"
+    },
+    {
+      "name": "driverId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Unique UUID of the driver"
+    },
+    {
+      "name": "tripId",
+      "type": "string",
+      "doc": "Unique UUID of the active trip"
+    },
+    {
+      "name": "eventType",
+      "type": {
+        "type": "enum",
+        "name": "TripLifecycleState",
+        "symbols": ["STARTED", "UPDATED", "COMPLETED", "CANCELLED"]
+      },
+      "doc": "Current status phase of the trip"
+    },
+    {
+      "name": "startedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the trip was started"
+    },
+    {
+      "name": "endedAt",
+      "type": ["null", {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }],
+      "default": null,
+      "doc": "Timestamp when the trip was ended/completed"
+    },
+    {
+      "name": "startLatitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Starting latitude coordinate"
+    },
+    {
+      "name": "startLongitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Starting longitude coordinate"
+    },
+    {
+      "name": "endLatitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Ending latitude coordinate"
+    },
+    {
+      "name": "endLongitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Ending longitude coordinate"
+    },
+    {
+      "name": "distanceKm",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Cumulative distance covered in kilometers"
+    },
+    {
+      "name": "fuelConsumedLitres",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Total volume of fuel consumed in litres"
+    },
+    {
+      "name": "avgSpeedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Average velocity during the trip"
+    },
+    {
+      "name": "maxSpeedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Max velocity recorded during the trip"
+    },
+    {
+      "name": "drivingDurationSeconds",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Total active motion duration in seconds"
+    },
+    {
+      "name": "idleDurationSeconds",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Total stationary engine idling duration in seconds"
+    },
+    {
+      "name": "harshAccelCount",
+      "type": "int",
+      "default": 0,
+      "doc": "Count of harsh acceleration violations during trip"
+    },
+    {
+      "name": "harshBrakeCount",
+      "type": "int",
+      "default": 0,
+      "doc": "Count of harsh braking violations during trip"
+    },
+    {
+      "name": "speedingCount",
+      "type": "int",
+      "default": 0,
+      "doc": "Count of speeding violations during trip"
+    }
+  ]
+}

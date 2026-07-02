@@ -1,0 +1,106 @@
+{
+  "type": "record",
+  "name": "TelemetryEvent",
+  "namespace": "com.fleetiq.events.telemetry",
+  "doc": "GPS telemetry event captured by vehicle tracking devices. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this specific telemetry event instance"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the vehicle"
+    },
+    {
+      "name": "deviceId",
+      "type": "string",
+      "doc": "Unique UUID of the tracking device"
+    },
+    {
+      "name": "recordedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the telemetry was recorded on the device"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "doc": "GPS latitude in decimal degrees"
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "GPS longitude in decimal degrees"
+    },
+    {
+      "name": "speedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vehicle speed in kilometers per hour"
+    },
+    {
+      "name": "heading",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vehicle heading/bearing in degrees (0-360)"
+    },
+    {
+      "name": "altitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Altitude in meters above sea level"
+    },
+    {
+      "name": "hdop",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Horizontal dilution of precision"
+    },
+    {
+      "name": "satellites",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Number of satellites locked"
+    },
+    {
+      "name": "ignition",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Ignition status state (true = ON, false = OFF)"
+    },
+    {
+      "name": "odometerKm",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Accumulative vehicle odometer reading in kilometers"
+    },
+    {
+      "name": "signalStrength",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Cellular signal strength value in dBm or scale units"
+    },
+    {
+      "name": "isBuffered",
+      "type": "boolean",
+      "default": false,
+      "doc": "Indicates if message was sent from device storage after being offline"
+    },
+    {
+      "name": "metadata",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional JSON payload containing auxiliary hardware status registers"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "type": "record",
+  "name": "AlertEvent",
+  "namespace": "com.fleetiq.events.alert",
+  "doc": "Real-time alert notification representing critical safety violations or device warnings. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this alert instance"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "alertType",
+      "type": {
+        "type": "enum",
+        "name": "AlertEventTypeName",
+        "doc": "Standard list of alert names mirroring database check constraints",
+        "symbols": [
+          "SPEEDING", "HARSH_ACCEL", "HARSH_BRAKE", "HARSH_CORNER", "IDLE_TIMEOUT", 
+          "GEOFENCE_ENTER", "GEOFENCE_EXIT", "FUEL_THEFT", "FUEL_DRAIN", "ENGINE_TEMP_HIGH", 
+          "BATTERY_VOLTAGE_LOW", "CHECK_ENGINE_DTC", "MAINTENANCE_DUE", "DOCUMENT_EXPIRY", 
+          "CRASH_DETECTED", "SOS_TRIGGERED", "CAMERA_DISCONNECTED", "ADAS_FORWARD_COLLISION", 
+          "ADAS_LANE_DEPARTURE", "DMS_DISTRACTION", "DMS_DROWSINESS", "CHARGING_FAULT", 
+          "BATTERY_TEMP_HIGH", "OTHER"
+        ]
+      },
+      "doc": "Functional type classification of the alarm"
+    },
+    {
+      "name": "severity",
+      "type": {
+        "type": "enum",
+        "name": "AlertSeverity",
+        "symbols": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+      },
+      "doc": "Priority tier of the alert"
+    },
+    {
+      "name": "vehicleId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the vehicle involved"
+    },
+    {
+      "name": "driverId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the driver operating the vehicle"
+    },
+    {
+      "name": "deviceId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the reporting hardware unit"
+    },
+    {
+      "name": "latitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "GPS latitude where the alert was triggered"
+    },
+    {
+      "name": "longitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "GPS longitude where the alert was triggered"
+    },
+    {
+      "name": "address",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Reverse geocoded location street name/landmark"
+    },
+    {
+      "name": "speedKmh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vehicle speed during the incident"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "doc": "Short summary title of the alert"
+    },
+    {
+      "name": "description",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Long form details about the alert context"
+    },
+    {
+      "name": "payload",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional raw JSON string representing additional parameters or freeze-frame registers"
+    },
+    {
+      "name": "geofenceId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the geofence violated"
+    },
+    {
+      "name": "tripId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional UUID of the trip segment active during violation"
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the alert was published by the rules engine"
+    }
+  ]
+}

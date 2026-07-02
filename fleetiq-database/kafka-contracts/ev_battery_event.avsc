@@ -1,0 +1,106 @@
+{
+  "type": "record",
+  "name": "EVBatteryEvent",
+  "namespace": "com.fleetiq.events.ev",
+  "doc": "Battery performance and charging telemetry from Electric Vehicles. Version 1.0.0",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique UUID for this specific EV battery telemetry packet"
+    },
+    {
+      "name": "tenantId",
+      "type": "string",
+      "doc": "Unique UUID of the tenant organization"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "doc": "Unique UUID of the EV vehicle"
+    },
+    {
+      "name": "recordedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp when the battery parameters were recorded"
+    },
+    {
+      "name": "socPct",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "State of Charge percentage (0.00 to 100.00)"
+    },
+    {
+      "name": "sohPct",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "State of Health percentage (battery capacity retention)"
+    },
+    {
+      "name": "batteryTempAvgC",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Average temperature of the battery packs in degrees Celsius"
+    },
+    {
+      "name": "batteryTempMaxC",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Maximum temperature of any battery cell/module"
+    },
+    {
+      "name": "cellVoltageMaxV",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Highest individual cell voltage measured"
+    },
+    {
+      "name": "cellVoltageMinV",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Lowest individual cell voltage measured"
+    },
+    {
+      "name": "chargeCycleCount",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Accumulative total charge/discharge cycles"
+    },
+    {
+      "name": "remainingRangeKm",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Estimated driving range left on current charge in kilometers"
+    },
+    {
+      "name": "chargerStatus",
+      "type": {
+        "type": "enum",
+        "name": "EVChargerStatus",
+        "symbols": ["DISCONNECTED", "CONNECTED", "CHARGING", "FULL", "FAULT"]
+      },
+      "doc": "Current connection status of charging plug"
+    },
+    {
+      "name": "powerDrawKw",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Power draw (discharging) or input (charging) in kilowatts"
+    },
+    {
+      "name": "energyConsumedWh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Incremental energy consumed since last check in Watt-hours"
+    },
+    {
+      "name": "regenEnergyWh",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Incremental energy recovered via regenerative braking in Watt-hours"
+    }
+  ]
+}
