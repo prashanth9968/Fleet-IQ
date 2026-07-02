@@ -38,7 +38,7 @@ public class Depot {
     @Column(name = "postal_code")
     private String postalCode;
 
-    @Column(name = "location", columnDefinition = "geometry(Point, 4326)")
+    @Column(name = "location", columnDefinition = "geography(Point, 4326)")
     private Point location;
 
     @Column(name = "contact_phone")
@@ -61,3 +61,4 @@ public class Depot {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 }
+
