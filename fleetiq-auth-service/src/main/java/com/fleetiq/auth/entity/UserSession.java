@@ -26,7 +26,7 @@ public class UserSession {
     @Column(name = "device_info", columnDefinition = "jsonb")
     private String deviceInfo;
 
-    @Column(name = "ip_address")
+    @Column(name = "ip_address", columnDefinition = "inet")
     private String ipAddress;
 
     @Column(name = "user_agent")
