@@ -1,0 +1,47 @@
+name: driver_app
+description: FleetIQ Driver App — Daily trips, inspections, safety scores, navigation, offline sync, SOS.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.3
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+  sqflite: ^2.3.0
+  drift: ^2.14.0
+  sqlite3_flutter_libs: ^0.5.18
+  path: ^1.8.3
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  fleetiq_theme:
+    path: ../../packages/theme
+  fleetiq_models:
+    path: ../../packages/models
+  fleetiq_api_client:
+    path: ../../packages/api_client
+  fleetiq_widgets:
+    path: ../../packages/widgets
+  fleetiq_shared:
+    path: ../../packages/shared
+  fleetiq_authentication:
+    path: ../../packages/authentication
+  fleetiq_notifications:
+    path: ../../packages/notifications
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  bloc_test: ^9.1.5
+  mocktail: ^1.0.0
+  drift_dev: ^2.14.0
+  build_runner: ^2.4.6
+
+flutter:
+  uses-material-design: true

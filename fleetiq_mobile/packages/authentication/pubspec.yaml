@@ -1,0 +1,19 @@
+name: fleetiq_authentication
+description: Shared authentication package for FleetIQ apps. Handles login, token refresh, secure storage, and session management.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  flutter_bloc: ^8.1.3
+  fleetiq_models:
+    path: ../models
+  fleetiq_shared:
+    path: ../shared

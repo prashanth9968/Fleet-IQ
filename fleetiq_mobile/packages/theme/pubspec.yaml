@@ -1,0 +1,12 @@
+name: fleetiq_theme
+description: Custom theme package for FleetIQ applications containing Material 3 configurations and custom Indigo/Slate color scheme.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
