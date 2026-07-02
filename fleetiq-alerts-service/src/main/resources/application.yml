@@ -1,0 +1,31 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: fleetiq-alerts-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fleetiq
+    username: fleetiq
+    password: fleetiq
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: fleetiq-alerts-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [Tenant:%X{tenantId}] [Trace:%X{traceId}] - %msg%n'
