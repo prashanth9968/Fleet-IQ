@@ -1,14 +1,14 @@
 -- V001__extensions_and_schemas.sql
 -- Enable core extensions in public schema
--- CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS postgis;
 -- CREATE EXTENSION IF NOT EXISTS timescaledb SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- Enable partition management and scheduling extensions
 CREATE SCHEMA IF NOT EXISTS partman;
--- CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
+CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
 -- -- CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- Reusable trigger function for updated_at
@@ -34,3 +34,4 @@ BEGIN
     RETURN result;
 END;
 $$ LANGUAGE plpgsql;
+

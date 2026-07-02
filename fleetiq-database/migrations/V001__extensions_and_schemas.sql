@@ -3,15 +3,15 @@
 -- Target: PostgreSQL 16 + TimescaleDB 2.x + PostGIS 3.x
 
 -- Enable core extensions in public schema
--- CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS postgis;
 -- CREATE EXTENSION IF NOT EXISTS timescaledb SCHEMA public;
--- CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- Enable partition management and scheduling extensions
 CREATE SCHEMA IF NOT EXISTS partman;
--- CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
+CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
 -- -- CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- Reusable trigger function for updated_at
@@ -40,3 +40,4 @@ $$ LANGUAGE plpgsql;
 
 COMMENT ON FUNCTION fn_set_updated_at() IS 'Trigger function to automatically set updated_at column to NOW() on UPDATE';
 COMMENT ON FUNCTION fn_generate_short_id() IS 'Generates a random 8-character alphanumeric ID for user/short codes';
+

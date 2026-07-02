@@ -1,0 +1,6 @@
+@echo off
+cd /d "C:\Users\naram\.gemini\antigravity\scratch"
+powershell -Command "$files = @('C:\Users\naram\.gemini\antigravity\scratch\fleetiq-auth-service\src\main\resources\db\migration\V001__extensions_and_schemas.sql','C:\Users\naram\.gemini\antigravity\scratch\fleetiq-database\migrations\V001__extensions_and_schemas.sql','C:\Users\naram\.gemini\antigravity\scratch\fleetiq-tracking-service\src\main\resources\db\migration\V001__extensions_and_schemas.sql','C:\Users\naram\.gemini\antigravity\scratch\fleetiq-vehicle-service\src\main\resources\db\migration\V001__extensions_and_schemas.sql'); foreach ($f in $files) { $c = Get-Content $f -Raw; $c = $c -replace '-- CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\".*', 'CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";'; $c = $c -replace '-- CREATE EXTENSION IF NOT EXISTS pgcrypto.*', 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'; $c = $c -replace '-- CREATE EXTENSION IF NOT EXISTS postgis.*', 'CREATE EXTENSION IF NOT EXISTS postgis;'; $c = $c -replace '-- CREATE EXTENSION IF NOT EXISTS pg_trgm.*', 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'; $c = $c -replace '-- CREATE EXTENSION IF NOT EXISTS pg_partman.*', 'CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;'; Set-Content $f -Value $c }"
+git add .
+git commit -m "fix: Re-enable required PostGIS extensions for Neon"
+git push
