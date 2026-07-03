@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const PORTS = {
-  auth: 8081,
-  vehicle: 8083,
-  tracking: 8082,
-  fuel: 8084,
-  alerts: 8085,
-  driver: 8086
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 // Standard multi-tenant mock data fallbacks
 const MOCK_VEHICLES = [
@@ -40,8 +33,7 @@ const MOCK_FUEL_CURVES = [
 ];
 
 export const fetchService = async (serviceName, endpoint, options = {}) => {
-  const port = PORTS[serviceName];
-  const url = `http://localhost:${port}/api/v1/${endpoint}`;
+  const url = `${API_BASE_URL}/${endpoint}`;
   
   const tenantId = localStorage.getItem('tenant_id') || '00000000-0000-0000-0000-000000000000';
   const token = localStorage.getItem('auth_token');
