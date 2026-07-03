@@ -11,6 +11,12 @@
 
 ---
 
+## 🌐 Live Demo
+The platform is currently live! You can access the React Admin Dashboard here:
+👉 **[FleetIQ Live Dashboard](https://fleet-iq-lilac.vercel.app/)**
+
+---
+
 ## 📖 Overview
 FleetIQ is a massive, multi-tenant IoT fleet management platform designed for scale. It handles real-time vehicle telemetry ingestion (via MQTT & Kafka), complex spatial geofencing algorithms, AI-driven vehicle diagnostics, and dynamic driver safety scoring.
 
@@ -82,12 +88,13 @@ docker compose up --build -d
 
 ---
 
-## ☁️ Cloud Deployment Strategy (Hybrid Free-Tier)
-To maintain the microservice architecture without incurring massive cloud costs, the project utilizes a hybrid strategy:
-* **Databases**: Serverless Postgres (Neon), Serverless Redis (Upstash).
-* **Messaging**: HiveMQ Cloud, Upstash Kafka.
-* **Frontend**: Netlify (Global CDN).
-* **Backend Services**: API Gateway + Core Services deployed on **Render**; high-throughput streaming services (Tracking/Fuel) deployed on **Koyeb**.
+## ☁️ Cloud Deployment Strategy (Production)
+To maintain the microservice architecture without incurring massive cloud costs, the project utilizes a hybrid modern cloud stack:
+* **Frontend**: Deployed on **Vercel** (`https://fleet-iq-lilac.vercel.app/`) for global CDN edge delivery.
+* **Backend Services**: API Gateway, Auth, Vehicle, and Driver services deployed natively on **Render** using Docker containers.
+* **Databases**: Serverless Postgres provided by **Neon**.
+* **Messaging**: **Upstash Kafka** used for real-time secure event streaming (`raw.telemetry` and `processed.telemetry`).
+* **CI/CD**: Fully automated deployments triggered via GitHub repository syncs (Render Blueprint `render.yaml`).
 
 ---
 
