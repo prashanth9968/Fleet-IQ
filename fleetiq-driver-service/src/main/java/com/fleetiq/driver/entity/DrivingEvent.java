@@ -29,7 +29,7 @@ public class DrivingEvent {
     @Column(name = "driver_id")
     private UUID driverId;
 
-    @Column(name = "event_type", nullable = false, length = 100)
+    @Column(name = "event_type", nullable = false, length = 50)
     private String eventType;
 
     @Column(name = "latitude")
