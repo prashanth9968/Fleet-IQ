@@ -45,7 +45,7 @@ public class Driver {
     @Column(name = "license_number", length = 100)
     private String licenseNumber;
 
-    @Column(name = "license_type", length = 50)
+    @Column(name = "license_type", length = 20)
     private String licenseType;
 
     @Column(name = "license_expiry")
@@ -54,19 +54,19 @@ public class Driver {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "blood_group", length = 10)
+    @Column(name = "blood_group", length = 5)
     private String bloodGroup;
 
-    @Column(name = "emergency_contact_name", length = 100)
+    @Column(name = "emergency_contact_name", length = 200)
     private String emergencyContactName;
 
-    @Column(name = "emergency_contact_phone", length = 50)
+    @Column(name = "emergency_contact_phone", length = 20)
     private String emergencyContactPhone;
 
-    @Column(name = "photo_url", length = 500)
+    @Column(name = "photo_url", columnDefinition = "text")
     private String photoUrl;
 
-    @Column(name = "status", nullable = false, length = 50)
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
 
     @Column(name = "hire_date")

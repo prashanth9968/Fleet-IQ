@@ -35,7 +35,7 @@ public class DriverAssignment {
     @Column(name = "assigned_by")
     private UUID assignedBy;
 
-    @Column(name = "status", nullable = false, length = 50)
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
 
     @Column(name = "notes", columnDefinition = "text")
