@@ -32,19 +32,19 @@ public class DrivingEvent {
     @Column(name = "event_type", nullable = false, length = 50)
     private String eventType;
 
-    @Column(name = "latitude")
+    @Column(name = "latitude", columnDefinition = "numeric(10,7)")
     private Double latitude;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", columnDefinition = "numeric(10,7)")
     private Double longitude;
 
-    @Column(name = "speed_kmh")
+    @Column(name = "speed_kmh", columnDefinition = "numeric(6,2)")
     private Double speedKmh;
 
-    @Column(name = "speed_limit_kmh")
+    @Column(name = "speed_limit_kmh", columnDefinition = "numeric(6,2)")
     private Double speedLimitKmh;
 
-    @Column(name = "magnitude")
+    @Column(name = "magnitude", columnDefinition = "numeric(5,2)")
     private Double magnitude;
 
     @Column(name = "duration_seconds")
