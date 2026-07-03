@@ -42,6 +42,24 @@ services:
       - key: SPRING_DATASOURCE_URL
         sync: false
 
+  - type: web
+    name: fleetiq-tracking-service
+    env: docker
+    dockerContext: fleetiq-tracking-service
+    dockerfilePath: fleetiq-tracking-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false # User must provide Upstash Kafka URL
+      - key: KAFKA_SASL_USERNAME
+        sync: false # User must provide Upstash Kafka Username
+      - key: KAFKA_SASL_PASSWORD
+        sync: false # User must provide Upstash Kafka Password
+
   # -----------------------------------------------------
   # API Gateway (Unifies all the services)
   # -----------------------------------------------------
