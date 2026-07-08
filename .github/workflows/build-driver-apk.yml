@@ -1,0 +1,52 @@
+name: Build Driver App APK
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'fleetiq_mobile/**'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  build-driver-apk:
+    name: Build Driver APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get Shared Package Dependencies
+        run: |
+          for pkg in fleetiq_mobile/packages/*/; do
+            echo "Getting dependencies for $pkg"
+            flutter pub get --directory="$pkg"
+          done
+
+      - name: Get Driver App Dependencies
+        run: flutter pub get --directory=fleetiq_mobile/apps/driver
+
+      - name: Build Driver App APK (Release)
+        run: |
+          cd fleetiq_mobile/apps/driver
+          flutter build apk --release --no-tree-shake-icons
+
+      - name: Upload Driver APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleetiq-driver-app-release-${{ github.run_number }}
+          path: fleetiq_mobile/apps/driver/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
