@@ -48,6 +48,11 @@ jobs:
           cd fleetiq_mobile/apps/driver
           flutter pub get
 
+      - name: Run Drift Code Generation (build_runner)
+        run: |
+          cd fleetiq_mobile/apps/driver
+          dart run build_runner build --delete-conflicting-outputs
+
       - name: Build Driver App APK (Release)
         run: |
           cd fleetiq_mobile/apps/driver
