@@ -21,35 +21,35 @@ spring:
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/v1/auth/**
         - id: vehicle-service
           uri: ${VEHICLE_SERVICE_URL:http://localhost:8082}
           predicates:
-            - Path=/api/vehicles/**, /api/devices/**, /api/vehicle-types/**
+            - Path=/api/v1/vehicles/**, /api/v1/devices/**, /api/v1/vehicle-types/**
         - id: tracking-service
           uri: ${TRACKING_SERVICE_URL:http://localhost:8084}
           predicates:
-            - Path=/api/tracking/**
+            - Path=/api/v1/tracking/**
         - id: fuel-service
           uri: ${FUEL_SERVICE_URL:http://localhost:8089}
           predicates:
-            - Path=/api/fuel/**
+            - Path=/api/v1/fuel/**
         - id: alerts-service
           uri: ${ALERTS_SERVICE_URL:http://localhost:8085}
           predicates:
-            - Path=/api/alerts/**, /api/geofences/**
+            - Path=/api/v1/alerts/**, /api/v1/geofences/**
         - id: driver-service
           uri: ${DRIVER_SERVICE_URL:http://localhost:8086}
           predicates:
-            - Path=/api/drivers/**, /api/driver-assignments/**, /api/driver-scores/**
+            - Path=/api/v1/drivers/**, /api/v1/driver-assignments/**, /api/v1/driver-scores/**
         - id: health-service
           uri: ${HEALTH_SERVICE_URL:http://localhost:8087}
           predicates:
-            - Path=/api/health/**, /api/maintenance/**, /api/work-orders/**
+            - Path=/api/v1/health/**, /api/v1/maintenance/**, /api/v1/work-orders/**
         - id: analytics-service
           uri: ${ANALYTICS_SERVICE_URL:http://localhost:8088}
           predicates:
-            - Path=/api/reports/**, /api/kpi/**
+            - Path=/api/v1/reports/**, /api/v1/kpi/**
 
 management:
   endpoints:
