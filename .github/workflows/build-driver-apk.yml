@@ -29,6 +29,13 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Install Android SDK 35
+        run: |
+          echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            --sdk_root=$ANDROID_SDK_ROOT
+
       - name: Get Shared Package Dependencies
         run: |
           for pkg in fleetiq_mobile/packages/*/; do
@@ -42,6 +49,14 @@ jobs:
         run: |
           cd fleetiq_mobile/apps/driver
           flutter create --platforms=android --project-name driver_app . 2>/dev/null || true
+
+      - name: Patch build.gradle to use SDK 35
+        run: |
+          BUILD_GRADLE="fleetiq_mobile/apps/driver/android/app/build.gradle"
+          sed -i 's/compileSdkVersion [0-9]*/compileSdkVersion 35/' "$BUILD_GRADLE"
+          sed -i 's/targetSdkVersion [0-9]*/targetSdkVersion 35/' "$BUILD_GRADLE"
+          echo "==> Patched build.gradle:"
+          grep -E "compileSdkVersion|targetSdkVersion" "$BUILD_GRADLE"
 
       - name: Get Driver App Dependencies
         run: |
