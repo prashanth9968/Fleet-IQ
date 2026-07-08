@@ -5,7 +5,7 @@ on:
     branches: [ master ]
     paths:
       - 'fleetiq_mobile/**'
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build-fleet-manager-apk:
@@ -32,12 +32,21 @@ jobs:
       - name: Get Shared Package Dependencies
         run: |
           for pkg in fleetiq_mobile/packages/*/; do
-            echo "Getting dependencies for $pkg"
-            flutter pub get --directory="$pkg"
+            echo "==> Getting dependencies for $pkg"
+            cd "$GITHUB_WORKSPACE/$pkg"
+            flutter pub get
+            cd "$GITHUB_WORKSPACE"
           done
 
+      - name: Generate Android Platform Files for Fleet Manager App
+        run: |
+          cd fleetiq_mobile/apps/fleet_manager
+          flutter create --platforms=android --project-name fleet_manager . 2>/dev/null || true
+
       - name: Get Fleet Manager App Dependencies
-        run: flutter pub get --directory=fleetiq_mobile/apps/fleet_manager
+        run: |
+          cd fleetiq_mobile/apps/fleet_manager
+          flutter pub get
 
       - name: Build Fleet Manager App APK (Release)
         run: |
