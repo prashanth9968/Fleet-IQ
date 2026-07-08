@@ -29,19 +29,10 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Delete Corrupted Android SDK 35 and Reinstall Fresh
+      - name: Clear Gradle Cache (Avoid Corrupted SDK Artifacts)
         run: |
-          echo "Removing corrupted android-35 platform..."
-          rm -rf $ANDROID_SDK_ROOT/platforms/android-35
-          echo "Accepting all SDK licenses..."
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_SDK_ROOT > /dev/null 2>&1 || true
-          echo "Installing fresh Android SDK 35 and Build Tools 35..."
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            --sdk_root=$ANDROID_SDK_ROOT
-          echo "Verifying android.jar..."
-          ls -lh $ANDROID_SDK_ROOT/platforms/android-35/android.jar
+          rm -rf ~/.gradle/caches/
+          rm -rf ~/.gradle/wrapper/
 
       - name: Get Shared Package Dependencies
         run: |
@@ -57,23 +48,23 @@ jobs:
           cd fleetiq_mobile/apps/driver
           flutter create --platforms=android --project-name driver_app . 2>/dev/null || true
 
-      - name: Patch compileSdkVersion to 35 (Groovy + Kotlin DSL)
+      - name: Patch compileSdkVersion to 34 (supports sqlite3_flutter_libs 0.4.x)
         run: |
           APP_DIR="fleetiq_mobile/apps/driver/android/app"
-          # Handle Groovy DSL (build.gradle)
+          # Groovy DSL (build.gradle)
           if [ -f "$APP_DIR/build.gradle" ]; then
             echo "==> Patching Groovy build.gradle"
-            sed -i 's/compileSdkVersion [0-9]*/compileSdkVersion 35/g' "$APP_DIR/build.gradle"
-            sed -i 's/targetSdkVersion [0-9]*/targetSdkVersion 35/g' "$APP_DIR/build.gradle"
-            cat "$APP_DIR/build.gradle"
+            sed -i 's/compileSdkVersion [0-9]*/compileSdkVersion 34/g' "$APP_DIR/build.gradle"
+            sed -i 's/targetSdkVersion [0-9]*/targetSdkVersion 34/g' "$APP_DIR/build.gradle"
           fi
-          # Handle Kotlin DSL (build.gradle.kts)
+          # Kotlin DSL (build.gradle.kts)
           if [ -f "$APP_DIR/build.gradle.kts" ]; then
             echo "==> Patching Kotlin build.gradle.kts"
-            sed -i 's/compileSdk = [0-9]*/compileSdk = 35/g' "$APP_DIR/build.gradle.kts"
-            sed -i 's/targetSdk = [0-9]*/targetSdk = 35/g' "$APP_DIR/build.gradle.kts"
-            cat "$APP_DIR/build.gradle.kts"
+            sed -i 's/compileSdk = [0-9]*/compileSdk = 34/g' "$APP_DIR/build.gradle.kts"
+            sed -i 's/targetSdk = [0-9]*/targetSdk = 34/g' "$APP_DIR/build.gradle.kts"
           fi
+          echo "==> Final SDK settings:"
+          grep -rE "compileSdk|targetSdk" "$APP_DIR/" || true
 
       - name: Get Driver App Dependencies
         run: |
