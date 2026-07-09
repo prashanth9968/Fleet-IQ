@@ -60,6 +60,54 @@ services:
       - key: KAFKA_SASL_PASSWORD
         sync: false # User must provide Upstash Kafka Password
 
+  - type: web
+    name: fleetiq-fuel-service
+    env: docker
+    dockerContext: fleetiq-fuel-service
+    dockerfilePath: fleetiq-fuel-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+  - type: web
+    name: fleetiq-alerts-service
+    env: docker
+    dockerContext: fleetiq-alerts-service
+    dockerfilePath: fleetiq-alerts-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+  - type: web
+    name: fleetiq-health-service
+    env: docker
+    dockerContext: fleetiq-health-service
+    dockerfilePath: fleetiq-health-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+  - type: web
+    name: fleetiq-analytics-service
+    env: docker
+    dockerContext: fleetiq-analytics-service
+    dockerfilePath: fleetiq-analytics-service/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
   # -----------------------------------------------------
   # API Gateway (Unifies all the services)
   # -----------------------------------------------------
@@ -78,4 +126,11 @@ services:
         value: https://fleetiq-vehicle-service.onrender.com
       - key: DRIVER_SERVICE_URL
         value: https://fleetiq-driver-service.onrender.com
-      # (Note: Tracking, Fuel, Alerts, Health, and Analytics can be added here once deployed)
+      - key: FUEL_SERVICE_URL
+        value: https://fleetiq-fuel-service.onrender.com
+      - key: ALERTS_SERVICE_URL
+        value: https://fleetiq-alerts-service.onrender.com
+      - key: HEALTH_SERVICE_URL
+        value: https://fleetiq-health-service.onrender.com
+      - key: ANALYTICS_SERVICE_URL
+        value: https://fleetiq-analytics-service.onrender.com
