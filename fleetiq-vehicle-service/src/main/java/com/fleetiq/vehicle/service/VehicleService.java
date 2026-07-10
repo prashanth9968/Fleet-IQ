@@ -16,4 +16,5 @@ public interface VehicleService {
     void deleteVehicle(UUID id);
     void assignDevice(UUID vehicleId, AssignDeviceRequest request, UUID assignedByUserId);
     void assignDriver(UUID vehicleId, AssignDriverRequest request, UUID assignedByUserId);
+    void updateLocation(UUID id, Double lat, Double lng, Double speed, Double heading);
 }

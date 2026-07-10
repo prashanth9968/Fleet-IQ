@@ -11,7 +11,7 @@ import com.fleetiq.fuel.state.VehicleFuelState.FuelSnapshot;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.MDC;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,16 +41,16 @@ public class FuelTheftDetectionService {
 
     private final FuelThresholdRepository fuelThresholdRepository;
     private final FuelAnomalyHistoryRepository fuelAnomalyHistoryRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
     public FuelTheftDetectionService(FuelThresholdRepository fuelThresholdRepository,
                                      FuelAnomalyHistoryRepository fuelAnomalyHistoryRepository,
-                                     KafkaTemplate<String, String> kafkaTemplate,
+                                     StringRedisTemplate redisTemplate,
                                      ObjectMapper objectMapper) {
         this.fuelThresholdRepository = fuelThresholdRepository;
         this.fuelAnomalyHistoryRepository = fuelAnomalyHistoryRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
 
@@ -174,7 +174,7 @@ public class FuelTheftDetectionService {
             record.headers().add("correlation-id", correlationId.getBytes(StandardCharsets.UTF_8));
             record.headers().add("producer-id", "fleetiq-fuel-service".getBytes(StandardCharsets.UTF_8));
 
-            kafkaTemplate.send(record);
+            redisTemplate.convertAndSend(record);
             log.debug("Published THEFT anomaly to {} for vehicle={}", ANOMALY_TOPIC, vehicleId);
         } catch (Exception e) {
             log.error("Failed to publish THEFT anomaly for vehicle={}: {}", vehicleId, e.getMessage(), e);

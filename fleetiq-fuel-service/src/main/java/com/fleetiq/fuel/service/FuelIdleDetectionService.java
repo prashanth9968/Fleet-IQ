@@ -8,7 +8,7 @@ import com.fleetiq.fuel.state.VehicleFuelState;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.MDC;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +35,14 @@ public class FuelIdleDetectionService {
     private static final long IDLE_DURATION_THRESHOLD_MINUTES = 10;
 
     private final FuelAnomalyHistoryRepository fuelAnomalyHistoryRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
     public FuelIdleDetectionService(FuelAnomalyHistoryRepository fuelAnomalyHistoryRepository,
-                                    KafkaTemplate<String, String> kafkaTemplate,
+                                    StringRedisTemplate redisTemplate,
                                     ObjectMapper objectMapper) {
         this.fuelAnomalyHistoryRepository = fuelAnomalyHistoryRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
 
@@ -147,7 +147,7 @@ public class FuelIdleDetectionService {
             record.headers().add("correlation-id", correlationId.getBytes(StandardCharsets.UTF_8));
             record.headers().add("producer-id", "fleetiq-fuel-service".getBytes(StandardCharsets.UTF_8));
 
-            kafkaTemplate.send(record);
+            redisTemplate.convertAndSend(record);
             log.debug("Published IDLE_BURN alert to {} for vehicle={}", ALERT_TOPIC, vehicleId);
         } catch (Exception e) {
             log.error("Failed to publish IDLE_BURN alert for vehicle={}: {}", vehicleId, e.getMessage(), e);

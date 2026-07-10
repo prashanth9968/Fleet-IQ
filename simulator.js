@@ -1,0 +1,49 @@
+const https = require('https');
+
+// Vehicle IDs from the seeded database (Omega Logistics)
+const vehicles = [
+    {
+        id: '44444444-0001-0000-0000-000000000001', // KA-01-MJ-1024
+        lat: 12.971598, // Starting in Bangalore
+        lng: 77.594562,
+        speed: 40,
+        heading: 45
+    },
+    {
+        id: '44444444-0001-0000-0000-000000000002', // KA-03-MK-4512
+        lat: 12.934533, // Starting in Koramangala
+        lng: 77.626579,
+        speed: 35,
+        heading: 45
+    }
+];
+
+const API_BASE_URL = 'https://fleetiq-api-gateway.onrender.com/api/v1/vehicles';
+
+console.log('🚀 Starting FleetIQ Telemetry Simulator...');
+console.log('📡 Sending live GPS data to Render API Gateway...');
+
+// Every 3 seconds, simulate vehicle movement and send to API
+setInterval(() => {
+    vehicles.forEach(v => {
+        // Simulate real driving movement in a specific direction (Heading)
+        v.lat += 0.0002; // Moving North
+        v.lng += 0.0001; // Moving East
+        
+        // Smoothly vary the speed between 40-80 km/h
+        v.speed = Math.max(40, Math.min(80, v.speed + (Math.random() - 0.5) * 5)); 
+        
+        const url = `${API_BASE_URL}/${v.id}/location?lat=${v.lat.toFixed(6)}&lng=${v.lng.toFixed(6)}&speed=${Math.round(v.speed)}&heading=${Math.round(v.heading)}`;
+        
+        const req = https.request(url, { method: 'PUT', headers: { 'X-Tenant-ID': '00000000-0000-0000-0000-000000000000' } }, (res) => {
+            if (res.statusCode === 200) {
+                console.log(`[SIMULATOR] Successfully moved Vehicle ${v.id.split('-')[0]} -> Speed: ${Math.round(v.speed)} km/h`);
+            } else {
+                console.error(`[SIMULATOR] Error: HTTP ${res.statusCode}`);
+            }
+        });
+        
+        req.on('error', (e) => console.error(e));
+        req.end();
+    });
+}, 3000);

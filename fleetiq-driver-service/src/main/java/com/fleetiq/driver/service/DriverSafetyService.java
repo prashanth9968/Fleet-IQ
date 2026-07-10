@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +30,10 @@ public class DriverSafetyService {
     private final DriverAssignmentRepository assignmentRepository;
     private final DriverScoringRuleRepository scoringRuleRepository;
     private final DriverSafetyScoreRepository safetyScoreRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "driving.events", groupId = "fleetiq-driver-group")
+    // Redis Listener Pending
     @Transactional
     public void onDrivingEvent(String payload) {
         try {
@@ -84,7 +84,7 @@ public class DriverSafetyService {
             updateMonthlySafetyScore(dto.tenantId(), driverId, dto.eventAt() != null ? dto.eventAt() : Instant.now(), penaltyPoints, dto.eventType());
 
             // 4. Publish to driver.events topic
-            kafkaTemplate.send("driver.events", dto);
+            redisTemplate.convertAndSend("driver.events", dto);
 
         } catch (Exception e) {
             log.error("Error processing driving event: {}", e.getMessage(), e);
@@ -168,7 +168,7 @@ public class DriverSafetyService {
                 monthlyScore.getTotalEvents(),
                 Instant.now()
         );
-        kafkaTemplate.send("driver.scores", scoreDto);
+        redisTemplate.convertAndSend("driver.scores", scoreDto);
     }
 
     private BigDecimal deduct(BigDecimal score, int penalty) {

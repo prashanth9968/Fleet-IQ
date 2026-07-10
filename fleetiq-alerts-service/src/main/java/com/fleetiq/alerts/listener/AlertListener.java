@@ -22,7 +22,7 @@ public class AlertListener {
     private final AlertRoutingService alertRoutingService;
 
     // Listen to unified system alerts (e.g. Geofence Evaluation emits these)
-    @KafkaListener(topics = "system.alerts", groupId = "fleetiq-alerts-group")
+    // Redis Listener Pending
     public void onSystemAlert(String payload) {
         try {
             UnifiedAlertEvent alert = objectMapper.readValue(payload, UnifiedAlertEvent.class);
@@ -33,7 +33,7 @@ public class AlertListener {
     }
 
     // Listen to fuel alerts (legacy integration into Unified model)
-    @KafkaListener(topics = {"fuel.alerts", "fuel.anomalies"}, groupId = "fleetiq-alerts-group")
+    // Redis Listener Pending
     public void onFuelAlert(String payload) {
         try {
             JsonNode node = objectMapper.readTree(payload);

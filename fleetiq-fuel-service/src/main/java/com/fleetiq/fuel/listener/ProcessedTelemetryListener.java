@@ -67,7 +67,7 @@ public class ProcessedTelemetryListener {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "processed.telemetry", groupId = "fleetiq-fuel-group")
+    // Redis Listener Pending
     public void listen(String message) {
         ProcessedTelemetry telemetry = null;
 

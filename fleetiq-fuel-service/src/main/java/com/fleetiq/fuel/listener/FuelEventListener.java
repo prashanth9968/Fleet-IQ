@@ -60,7 +60,7 @@ public class FuelEventListener {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "fuel.events", groupId = "fleetiq-fuel-group")
+    // Redis Listener Pending
     public void listen(String message) {
         FuelEvent fuelEvent = null;
 

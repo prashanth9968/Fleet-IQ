@@ -8,7 +8,7 @@ import com.fleetiq.fuel.repository.FuelReadingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.MDC;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,16 +34,16 @@ public class FuelAnalyticsService {
 
     private final FuelReadingRepository fuelReadingRepository;
     private final FuelBaselineRepository fuelBaselineRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
     public FuelAnalyticsService(FuelReadingRepository fuelReadingRepository,
                                 FuelBaselineRepository fuelBaselineRepository,
-                                KafkaTemplate<String, String> kafkaTemplate,
+                                StringRedisTemplate redisTemplate,
                                 ObjectMapper objectMapper) {
         this.fuelReadingRepository = fuelReadingRepository;
         this.fuelBaselineRepository = fuelBaselineRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
 
@@ -152,7 +152,7 @@ public class FuelAnalyticsService {
             record.headers().add("tenant-id", tenantId.toString().getBytes(StandardCharsets.UTF_8));
             record.headers().add("producer-id", "fleetiq-fuel-service".getBytes(StandardCharsets.UTF_8));
 
-            kafkaTemplate.send(record);
+            redisTemplate.convertAndSend(record);
             log.debug("Published fuel analytics to {} for vehicle={}", ANALYTICS_TOPIC, vehicleId);
         } catch (Exception e) {
             log.error("Failed to publish fuel analytics for vehicle={}: {}", vehicleId, e.getMessage(), e);

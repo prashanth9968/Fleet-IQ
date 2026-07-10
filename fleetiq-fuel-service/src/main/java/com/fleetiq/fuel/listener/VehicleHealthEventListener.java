@@ -44,7 +44,7 @@ public class VehicleHealthEventListener {
         return vehicleStates;
     }
 
-    @KafkaListener(topics = "vehicle.health.events", groupId = "fleetiq-fuel-group")
+    // Redis Listener Pending
     public void listen(String message) {
         VehicleHealthEvent healthEvent = null;
 

@@ -14,7 +14,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class TrackingServiceImpl implements TrackingService {
     private final DeviceVehicleAssignmentRepository deviceVehicleAssignmentRepository;
     private final MetricsService metricsService;
     private final Cache<String, AssignmentCacheEntry> assignmentCache;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ObjectMapper objectMapper;
 
@@ -54,7 +54,7 @@ public class TrackingServiceImpl implements TrackingService {
             DeviceVehicleAssignmentRepository deviceVehicleAssignmentRepository,
             MetricsService metricsService,
             Cache<String, AssignmentCacheEntry> assignmentCache,
-            KafkaTemplate<String, String> kafkaTemplate,
+            StringRedisTemplate redisTemplate,
             SimpMessagingTemplate simpMessagingTemplate,
             ObjectMapper objectMapper
     ) {
@@ -63,7 +63,7 @@ public class TrackingServiceImpl implements TrackingService {
         this.deviceVehicleAssignmentRepository = deviceVehicleAssignmentRepository;
         this.metricsService = metricsService;
         this.assignmentCache = assignmentCache;
-        this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.objectMapper = objectMapper;
     }
@@ -191,7 +191,7 @@ public class TrackingServiceImpl implements TrackingService {
                 record.headers().add("correlation-id", correlationId.getBytes(StandardCharsets.UTF_8));
                 record.headers().add("producer-id", "fleetiq-tracking-service".getBytes(StandardCharsets.UTF_8));
 
-                kafkaTemplate.send(record);
+                redisTemplate.convertAndSend(record);
 
                 // 5. Broadcast live update to WS STOMP topics
                 simpMessagingTemplate.convertAndSend("/topic/vehicle/" + vehicleId, processed);
@@ -239,7 +239,7 @@ public class TrackingServiceImpl implements TrackingService {
             record.headers().add("producer-id", "fleetiq-tracking-service".getBytes(StandardCharsets.UTF_8));
             record.headers().add("error-reason", reason.getBytes(StandardCharsets.UTF_8));
 
-            kafkaTemplate.send(record);
+            redisTemplate.convertAndSend(record);
         } catch (Exception e) {
             log.error("Failed to publish telemetry error message to DLQ", e);
         }

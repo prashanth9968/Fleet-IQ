@@ -104,5 +104,16 @@ public class VehicleController {
         UUID userId = getCurrentUserId();
         vehicleService.assignDriver(id, request, userId);
         return ResponseEntity.ok().build();
+    @PutMapping("/{id}/location")
+    @Operation(summary = "Update vehicle real-time location (used by simulator)")
+    public ResponseEntity<Void> updateLocation(
+            @PathVariable("id") UUID id,
+            @RequestParam("lat") Double lat,
+            @RequestParam("lng") Double lng,
+            @RequestParam("speed") Double speed,
+            @RequestParam("heading") Double heading
+    ) {
+        vehicleService.updateLocation(id, lat, lng, speed, heading);
+        return ResponseEntity.ok().build();
     }
 }

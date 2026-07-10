@@ -62,6 +62,18 @@ public class Vehicle {
     @Column(name = "engine_hours", precision = 10, scale = 2)
     private BigDecimal engineHours = BigDecimal.ZERO;
 
+    @Column(precision = 10, scale = 6)
+    private Double latitude;
+
+    @Column(precision = 10, scale = 6)
+    private Double longitude;
+
+    @Column(name = "speed_kmh", precision = 5, scale = 2)
+    private Double speedKmh;
+
+    @Column(precision = 5, scale = 2)
+    private Double heading;
+
     @Column(nullable = false)
     private String status = "ACTIVE";
 

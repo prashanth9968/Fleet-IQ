@@ -10,7 +10,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class AlertRoutingService {
 
     private final AlertRuleRepository alertRuleRepository;
     private final AlertHistoryRepository alertHistoryRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     // Deduplication cache: key = vehicleId + alertType
     private final Cache<String, Boolean> recentAlertsCache = Caffeine.newBuilder()
@@ -71,7 +71,7 @@ public class AlertRoutingService {
         alertHistoryRepository.save(history);
 
         // 4. Analytics Hook
-        kafkaTemplate.send("alert.analytics", event);
+        redisTemplate.convertAndSend("alert.analytics", event);
 
         if (!matched) {
             log.info("Alert {} stored but no routing rules matched.", event.alertType());

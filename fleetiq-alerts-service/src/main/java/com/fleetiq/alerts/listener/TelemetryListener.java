@@ -16,7 +16,7 @@ public class TelemetryListener {
     private final ObjectMapper objectMapper;
     private final GeofenceEvaluationService geofenceEvaluationService;
 
-    @KafkaListener(topics = "processed.telemetry", groupId = "fleetiq-alerts-group")
+    // Redis Listener Pending
     public void onProcessedTelemetry(String payload) {
         try {
             ProcessedTelemetry telemetry = objectMapper.readValue(payload, ProcessedTelemetry.class);

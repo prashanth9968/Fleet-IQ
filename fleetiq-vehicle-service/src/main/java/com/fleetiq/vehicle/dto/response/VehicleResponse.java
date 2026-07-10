@@ -17,6 +17,10 @@ public record VehicleResponse(
     BigDecimal fuelTankCapacityLitres,
     BigDecimal odometerReadingKm,
     BigDecimal engineHours,
+    Double latitude,
+    Double longitude,
+    Double speedKmh,
+    Double heading,
     String status,
     LocalDate acquisitionDate,
     

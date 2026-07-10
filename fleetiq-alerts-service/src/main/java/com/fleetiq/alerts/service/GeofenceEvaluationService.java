@@ -8,7 +8,7 @@ import com.fleetiq.alerts.repository.GeofenceEventRepository;
 import com.fleetiq.alerts.state.VehicleGeofenceState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.locationtech.jts.geom.Coordinate;
 
@@ -28,7 +28,7 @@ public class GeofenceEvaluationService {
 
     private final GeofenceCacheService geofenceCacheService;
     private final GeofenceEventRepository geofenceEventRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     // Per-vehicle state cache
     private final Map<UUID, VehicleGeofenceState> vehicleStates = new ConcurrentHashMap<>();
@@ -176,6 +176,6 @@ public class GeofenceEvaluationService {
                 tenantId, vehicleId, "fleetiq-alerts-service", alertType, priority, message, OffsetDateTime.now(), metadata, UUID.randomUUID().toString()
         );
         // We publish geofence anomalies back to the unified alert queue so the AlertRoutingService can pick them up
-        kafkaTemplate.send("system.alerts", alert);
+        redisTemplate.convertAndSend("system.alerts", alert);
     }
 }

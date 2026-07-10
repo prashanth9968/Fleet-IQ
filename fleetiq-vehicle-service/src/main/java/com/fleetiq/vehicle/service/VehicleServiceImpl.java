@@ -183,6 +183,18 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
+    public void updateLocation(UUID id, Double lat, Double lng, Double speed, Double heading) {
+        Vehicle vehicle = vehicleRepository.findByIdAndTenantIdAndDeletedAtIsNull(id, getRequiredTenantId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+        vehicle.setLatitude(lat);
+        vehicle.setLongitude(lng);
+        vehicle.setSpeedKmh(speed);
+        vehicle.setHeading(heading);
+        vehicleRepository.save(vehicle);
+    }
+
+    @Override
+    @Transactional
     public void deleteVehicle(UUID id) {
         UUID tenantId = getRequiredTenantId();
         Vehicle vehicle = vehicleRepository.findByIdAndTenantIdAndDeletedAtIsNull(id, tenantId)
@@ -313,6 +325,10 @@ public class VehicleServiceImpl implements VehicleService {
                 vehicle.getFuelTankCapacityLitres(),
                 vehicle.getOdometerReadingKm(),
                 vehicle.getEngineHours(),
+                vehicle.getLatitude(),
+                vehicle.getLongitude(),
+                vehicle.getSpeedKmh(),
+                vehicle.getHeading(),
                 vehicle.getStatus(),
                 vehicle.getAcquisitionDate(),
                 vehicle.getVehicleType().getId(),

@@ -100,35 +100,17 @@ export const LiveMap = () => {
 
   // 4. Simulate active client-side movement when WebSocket is idle
   useEffect(() => {
-    if (!simulationActive) return;
-
-    const interval = setInterval(() => {
-      setVehicles(prev => prev.map(v => {
-        if (v.status !== 'ACTIVE') return v;
-        // Move vehicle coordinates slightly
-        const deltaLat = (Math.random() - 0.5) * 0.001;
-        const deltaLng = (Math.random() - 0.5) * 0.001;
-        const newLat = v.latitude + deltaLat;
-        const newLng = v.longitude + deltaLng;
-        const speed = 40 + Math.random() * 30; // 40-70 km/h
-
-        // If markers are on map, update position
-        if (markers.current[v.id]) {
-          markers.current[v.id].setLatLng([newLat, newLng]);
-        }
-
-        return {
-          ...v,
-          latitude: newLat,
-          longitude: newLng,
-          speedKmh: speed,
-          heading: Math.atan2(deltaLng, deltaLat) * (180 / Math.PI)
-        };
-      }));
+    // Poll the REAL API every 3 seconds to get live GPS updates from the DB
+    const interval = setInterval(async () => {
+      try {
+        const data = await fetchService('vehicle', 'vehicles');
+        if (data) setVehicles(data);
+      } catch (e) {
+        console.error("Failed to fetch live vehicles");
+      }
     }, 3000);
-
     return () => clearInterval(interval);
-  }, [simulationActive]);
+  }, []);
 
   return (
     <div style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 150px)' }}>
@@ -136,14 +118,7 @@ export const LiveMap = () => {
       <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '20px', margin: 0 }}>Active Fleet</h2>
-          <button 
-            className="btn btn-secondary" 
-            style={{ padding: '6px 12px', fontSize: '12px' }}
-            onClick={() => setSimulationActive(!simulationActive)}
-          >
-            {simulationActive ? <Square size={12} /> : <Play size={12} />}
-            <span>{simulationActive ? 'Pause Sim' : 'Start Sim'}</span>
-          </button>
+          <div style={{fontSize: '12px', color: 'var(--success)'}}>Live GPS Sync: Active</div>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>

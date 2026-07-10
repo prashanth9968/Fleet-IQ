@@ -8,7 +8,7 @@ import com.fleetiq.fuel.state.VehicleFuelState;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.MDC;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +33,14 @@ public class RefuelDetectionService {
     private static final long REFUEL_WINDOW_MINUTES = 10;
 
     private final FuelRefuelEventRepository fuelRefuelEventRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
     public RefuelDetectionService(FuelRefuelEventRepository fuelRefuelEventRepository,
-                                  KafkaTemplate<String, String> kafkaTemplate,
+                                  StringRedisTemplate redisTemplate,
                                   ObjectMapper objectMapper) {
         this.fuelRefuelEventRepository = fuelRefuelEventRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
 
@@ -140,7 +140,7 @@ public class RefuelDetectionService {
             record.headers().add("correlation-id", correlationId.getBytes(StandardCharsets.UTF_8));
             record.headers().add("producer-id", "fleetiq-fuel-service".getBytes(StandardCharsets.UTF_8));
 
-            kafkaTemplate.send(record);
+            redisTemplate.convertAndSend(record);
             log.debug("Published refuel event to {} for vehicle={}, volume={} L",
                     REFUEL_TOPIC, vehicleId, String.format("%.2f", increase));
         } catch (Exception e) {
