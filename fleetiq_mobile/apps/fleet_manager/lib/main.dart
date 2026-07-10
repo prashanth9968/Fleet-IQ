@@ -16,7 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
-  final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api/v1'));
+  final dio = Dio(BaseOptions(baseUrl: 'https://fleetiq-api-gateway.onrender.com/api/v1'));
 
   final authRepository = AuthRepository(dio: dio, prefs: prefs);
   final notificationService = NotificationService();
