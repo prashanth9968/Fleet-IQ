@@ -9,7 +9,7 @@ import com.fleetiq.driver.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -31,7 +31,7 @@ class DriverSafetyServiceTest {
     private DriverAssignmentRepository assignmentRepository;
     private DriverScoringRuleRepository scoringRuleRepository;
     private DriverSafetyScoreRepository safetyScoreRepository;
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private StringRedisTemplate redisTemplate;
     private ObjectMapper objectMapper;
     private DriverSafetyService service;
 
@@ -45,7 +45,7 @@ class DriverSafetyServiceTest {
         assignmentRepository = mock(DriverAssignmentRepository.class);
         scoringRuleRepository = mock(DriverScoringRuleRepository.class);
         safetyScoreRepository = mock(DriverSafetyScoreRepository.class);
-        kafkaTemplate = mock(KafkaTemplate.class);
+        redisTemplate = mock(StringRedisTemplate.class);
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         service = new DriverSafetyService(
@@ -53,7 +53,7 @@ class DriverSafetyServiceTest {
                 assignmentRepository,
                 scoringRuleRepository,
                 safetyScoreRepository,
-                kafkaTemplate,
+                redisTemplate,
                 objectMapper
         );
     }
@@ -98,8 +98,8 @@ class DriverSafetyServiceTest {
         assertThat(score.getTotalEvents()).isEqualTo(1);
 
         // Verify published score update
-        verify(kafkaTemplate, times(1)).send(eq("driver.scores"), any(DriverScoreDto.class));
-        verify(kafkaTemplate, times(1)).send(eq("driver.events"), any(DrivingEventDto.class));
+        verify(redisTemplate, times(1)).convertAndSend(eq("driver.scores"), any(DriverScoreDto.class));
+        verify(redisTemplate, times(1)).convertAndSend(eq("driver.events"), any(DrivingEventDto.class));
     }
 
     @Test
