@@ -11,18 +11,21 @@ import '../../styles/components.css';
 
 export const FuelDashboard = () => {
   const [fuelData, setFuelData] = useState([]);
-  const [refuels, setRefuels] = useState([
-    { id: 'rf1', date: '2026-07-01 10:15', before: '15.0L', after: '380.0L', added: '365.0L', cost: '$410.50' },
-    { id: 'rf2', date: '2026-06-29 14:30', before: '42.0L', after: '350.0L', added: '308.0L', cost: '$345.00' }
-  ]);
-  const [anomalies, setAnomalies] = useState([
-    { id: 'an1', date: '2026-07-01 12:45', type: 'THEFT', volume: '-25.0L', location: 'Highway 4 Depo', status: 'OPEN' }
-  ]);
+  const [refuels, setRefuels] = useState([]);
+  const [anomalies, setAnomalies] = useState([]);
+  const [vehicle, setVehicle] = useState(null);
 
   useEffect(() => {
     const loadFuel = async () => {
-      const data = await fetchService('fuel', 'fuel-readings');
-      setFuelData(data || []);
+      try {
+        const data = await fetchService('fuel', 'fuel-readings');
+        setFuelData(data?.readings || []);
+        setRefuels(data?.refuels || []);
+        setAnomalies(data?.anomalies || []);
+        setVehicle(data?.vehicle || null);
+      } catch (err) {
+        console.error("Failed to load fuel data", err);
+      }
     };
     loadFuel();
   }, []);
@@ -37,21 +40,21 @@ export const FuelDashboard = () => {
       <div className="grid grid-cols-3">
         <StatCard
           title="Average Efficiency"
-          value="4.2 km/L"
-          changeText="Optimal operation bounds"
+          value={vehicle?.avgEfficiency ? `${vehicle.avgEfficiency} km/L` : 'N/A'}
+          changeText={vehicle?.avgEfficiency ? "Optimal operation bounds" : "Waiting for telemetry..."}
           icon={Droplet}
         />
         <StatCard
           title="Refueling Frequency"
-          value="2 Events"
-          changeText="Last 72 hours"
+          value={`${refuels.length} Events`}
+          changeText={refuels.length > 0 ? "Last 72 hours" : "No recent events"}
           icon={RefreshCw}
         />
         <StatCard
           title="Active Fuel Alerts"
           value={anomalies.filter(a => a.status === 'OPEN').length}
-          changeText="Action required on thefts"
-          isNegative={anomalies.length > 0}
+          changeText={anomalies.length > 0 ? "Action required on thefts" : "All clear"}
+          isNegative={anomalies.filter(a => a.status === 'OPEN').length > 0}
           icon={AlertTriangle}
         />
       </div>
@@ -60,38 +63,50 @@ export const FuelDashboard = () => {
         {/* Left Circular Gauge */}
         <Card title="Current Fuel Level (Primary)" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ padding: '20px 0' }}>
-            <FuelGauge percentage={68.3} />
+            {vehicle?.currentFuelLevel !== undefined && vehicle?.tankCapacity ? (
+               <FuelGauge percentage={(vehicle.currentFuelLevel / vehicle.tankCapacity) * 100} />
+            ) : (
+               <div style={{ width: '200px', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '8px solid var(--border-color)', color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '12px', textAlign: 'center', padding: '20px' }}>Waiting for live telemetry...</div>
+            )}
           </div>
           <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-            <strong>TATA Prima (KA-01-MJ-1024)</strong><br />
-            273.2 Litres remaining (Capacity 400L)
+            <strong>{vehicle?.regNum || 'Select a vehicle'}</strong><br />
+            {vehicle?.currentFuelLevel !== undefined ? `${vehicle.currentFuelLevel} Litres remaining (Capacity ${vehicle.tankCapacity || 0}L)` : 'No data'}
           </div>
         </Card>
 
         {/* Right Recharts Area Chart */}
         <div style={{ gridColumn: 'span 2' }}>
           <ChartCard title="Fuel consumption curves (Last 6 Hours)">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={fuelData}>
-                <defs>
-                  <linearGradient id="colorFuel" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                <XAxis dataKey="time" stroke="var(--text-tertiary)" fontSize={12} />
-                <YAxis domain={[0, 100]} stroke="var(--text-tertiary)" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'var(--bg-secondary)', 
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-primary)'
-                  }} 
-                />
-                <Area type="monotone" dataKey="level" stroke="var(--accent)" strokeWidth={2} fillOpacity={1} fill="url(#colorFuel)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div style={{ width: '100%', height: '100%', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {fuelData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={fuelData}>
+                    <defs>
+                      <linearGradient id="colorFuel" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                    <XAxis dataKey="time" stroke="var(--text-tertiary)" fontSize={12} />
+                    <YAxis domain={[0, 100]} stroke="var(--text-tertiary)" fontSize={12} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'var(--bg-secondary)', 
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-primary)'
+                      }} 
+                    />
+                    <Area type="monotone" dataKey="level" stroke="var(--accent)" strokeWidth={2} fillOpacity={1} fill="url(#colorFuel)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div style={{ color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+                  Waiting for live telemetry...
+                </div>
+              )}
+            </div>
           </ChartCard>
         </div>
       </div>
@@ -99,45 +114,57 @@ export const FuelDashboard = () => {
       <div className="grid grid-cols-2">
         {/* Refueling log */}
         <Card title="Recent Refuelings">
-          <Table
-            headers={['Date & Time', 'Fuel Before', 'Fuel After', 'Fuel Added', 'Total Cost']}
-            data={refuels}
-            renderRow={(rf) => (
-              <tr key={rf.id}>
-                <td>{rf.date}</td>
-                <td>{rf.before}</td>
-                <td>{rf.after}</td>
-                <td style={{ color: 'var(--success)', fontWeight: '600' }}>+{rf.added}</td>
-                <td style={{ fontWeight: '600' }}>{rf.cost}</td>
-              </tr>
-            )}
-          />
+          {refuels.length > 0 ? (
+            <Table
+              headers={['Date & Time', 'Fuel Before', 'Fuel After', 'Fuel Added', 'Total Cost']}
+              data={refuels}
+              renderRow={(rf) => (
+                <tr key={rf.id}>
+                  <td>{rf.date}</td>
+                  <td>{rf.before}</td>
+                  <td>{rf.after}</td>
+                  <td style={{ color: 'var(--success)', fontWeight: '600' }}>+{rf.added}</td>
+                  <td style={{ fontWeight: '600' }}>{rf.cost}</td>
+                </tr>
+              )}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '14px' }}>
+              No recent refuelings recorded.
+            </div>
+          )}
         </Card>
 
         {/* Anomaly list */}
         <Card title="Fuel Anomalies & Thefts">
-          <Table
-            headers={['Date & Time', 'Alert Type', 'Discharge Volume', 'Location', 'Status']}
-            data={anomalies}
-            renderRow={(an) => (
-              <tr key={an.id}>
-                <td>{an.date}</td>
-                <td><code style={{ color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>{an.type}</code></td>
-                <td style={{ color: 'var(--danger)', fontWeight: '600' }}>{an.volume}</td>
-                <td>{an.location}</td>
-                <td>
-                  <span style={{
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    backgroundColor: an.status === 'OPEN' ? 'var(--danger-bg)' : 'var(--success-bg)',
-                    color: an.status === 'OPEN' ? 'var(--danger)' : 'var(--success)'
-                  }}>{an.status}</span>
-                </td>
-              </tr>
-            )}
-          />
+          {anomalies.length > 0 ? (
+            <Table
+              headers={['Date & Time', 'Alert Type', 'Discharge Volume', 'Location', 'Status']}
+              data={anomalies}
+              renderRow={(an) => (
+                <tr key={an.id}>
+                  <td>{an.date}</td>
+                  <td><code style={{ color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>{an.type}</code></td>
+                  <td style={{ color: 'var(--danger)', fontWeight: '600' }}>{an.volume}</td>
+                  <td>{an.location}</td>
+                  <td>
+                    <span style={{
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      backgroundColor: an.status === 'OPEN' ? 'var(--danger-bg)' : 'var(--success-bg)',
+                      color: an.status === 'OPEN' ? 'var(--danger)' : 'var(--success)'
+                    }}>{an.status}</span>
+                  </td>
+                </tr>
+              )}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '14px' }}>
+              No active anomalies detected.
+            </div>
+          )}
         </Card>
       </div>
     </div>

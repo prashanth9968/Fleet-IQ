@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '../../components/common/Card';
 import { Table } from '../../components/common/Table';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BarChart3, FileText, Download, Calendar, Play, Filter } from 'lucide-react';
+import { BarChart3, FileText, Download, Calendar, Play, Filter, Share2, Mail, MessageCircle, Link } from 'lucide-react';
 import '../../styles/components.css';
 
 export const ReportsDashboard = () => {
@@ -21,9 +21,9 @@ export const ReportsDashboard = () => {
     e.preventDefault();
     const newReport = {
       id: `rep${reports.length + 1}`,
-      name: `Custom Fleet KPIs (${startDate} - ${endDate})`,
+      name: `Custom Fleet KPIs (${startDate} to ${endDate})`,
       type: reportType,
-      period: `${startDate} - ${endDate}`,
+      period: `${startDate} to ${endDate}`,
       format: format,
       size: format === 'CSV' ? '45 KB' : format === 'XLSX' ? '280 KB' : '1.4 MB',
       date: new Date().toISOString().split('T')[0]
@@ -40,6 +40,22 @@ export const ReportsDashboard = () => {
     { day: 'Sat', Utilization: 76, Alerts: 1 },
     { day: 'Sun', Utilization: 70, Alerts: 2 }
   ];
+
+  const handleShare = (method, reportName) => {
+    const link = `https://fleetiq-demo.com/reports/${reportName.replace(/ /g, '_')}`;
+    const text = `Check out the latest FleetIQ report: ${reportName} - ${link}`;
+    
+    if (method === 'whatsapp') {
+      window.open(`whatsapp://send?text=${encodeURIComponent(text)}`);
+    } else if (method === 'email') {
+      window.open(`mailto:?subject=${encodeURIComponent(reportName)}&body=${encodeURIComponent(text)}`);
+    } else if (method === 'copy') {
+      navigator.clipboard.writeText(link);
+      alert('Link copied to clipboard!');
+    } else if (method === 'download') {
+      alert(`Downloading ${reportName}...`);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -127,57 +143,15 @@ export const ReportsDashboard = () => {
         </Card>
       </div>
 
-      {/* Leaderboards Grid */}
-      <div className="grid grid-cols-2">
-        <Card title="Best Fuel Efficiency (Leaderboard)">
-          <Table
-            headers={['Rank', 'Vehicle Reg', 'Distance', 'Consumption', 'Efficiency']}
-            data={[
-              { rank: '#1', reg: 'KA-01-MJ-1024', dist: '420.5 km', fuel: '98.5 L', eff: '4.26 km/L' },
-              { rank: '#2', reg: 'KA-03-MK-4512', dist: '380.2 km', fuel: '92.0 L', eff: '4.13 km/L' },
-              { rank: '#3', reg: 'DL-01-AA-5678', dist: '512.4 km', fuel: '131.0 L', eff: '3.91 km/L' }
-            ]}
-            renderRow={(row, idx) => (
-              <tr key={idx}>
-                <td style={{ fontWeight: '700' }}>{row.rank}</td>
-                <td style={{ fontWeight: '600' }}>{row.reg}</td>
-                <td>{row.dist}</td>
-                <td>{row.fuel}</td>
-                <td style={{ color: 'var(--success)', fontWeight: '600' }}>{row.eff}</td>
-              </tr>
-            )}
-          />
-        </Card>
-
-        <Card title="Highest Idle Times (Violations)">
-          <Table
-            headers={['Rank', 'Vehicle Reg', 'Driver Name', 'Harsh Idle Duration', 'Fuel Wasted']}
-            data={[
-              { rank: '#1', reg: 'DL-01-AA-5678', driver: 'Robert Vance', idle: '42 mins', wasted: '12.6 L' },
-              { rank: '#2', reg: 'KA-01-MJ-1024', driver: 'John Doe', idle: '15 mins', wasted: '4.5 L' }
-            ]}
-            renderRow={(row, idx) => (
-              <tr key={idx}>
-                <td style={{ fontWeight: '700' }}>{row.rank}</td>
-                <td style={{ fontWeight: '600' }}>{row.reg}</td>
-                <td>{row.driver}</td>
-                <td style={{ color: 'var(--danger)', fontWeight: '600' }}>{row.idle}</td>
-                <td style={{ color: 'var(--danger)' }}>{row.wasted}</td>
-              </tr>
-            )}
-          />
-        </Card>
-      </div>
-
       {/* Downloads ledger */}
       <Card title="Report Audit Ledger">
         <Table
-          headers={['Generate Date', 'Report Name', 'Report Type', 'Date Period Coverage', 'Export Format', 'File Size', 'Action']}
+          headers={['Generate Date', 'Report Name', 'Type', 'Period Coverage', 'Format', 'Share & Download']}
           data={reports}
           renderRow={(r) => (
             <tr key={r.id}>
               <td>{r.date}</td>
-              <td style={{ fontWeight: '500' }}>{r.name}</td>
+              <td style={{ fontWeight: '500', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={r.name}>{r.name}</td>
               <td><code>{r.type}</code></td>
               <td>{r.period}</td>
               <td>
@@ -188,11 +162,21 @@ export const ReportsDashboard = () => {
                   color: r.format === 'PDF' ? 'var(--danger)' : r.format === 'XLSX' ? 'var(--success)' : 'var(--accent)'
                 }}>{r.format}</span>
               </td>
-              <td>{r.size}</td>
               <td>
-                <a href="#" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={(e) => { e.preventDefault(); alert(`Downloading ${r.name}...`); }}>
-                  <Download size={12} /> Download
-                </a>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button onClick={() => handleShare('download', r.name)} className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} title="Download">
+                    <Download size={14} />
+                  </button>
+                  <button onClick={() => handleShare('copy', r.name)} className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} title="Copy Link">
+                    <Link size={14} />
+                  </button>
+                  <button onClick={() => handleShare('email', r.name)} className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} title="Share via Email">
+                    <Mail size={14} />
+                  </button>
+                  <button onClick={() => handleShare('whatsapp', r.name)} className="btn" style={{ padding: '4px 8px', fontSize: '11px', backgroundColor: '#25D366', color: 'white' }} title="Share via WhatsApp">
+                    <MessageCircle size={14} />
+                  </button>
+                </div>
               </td>
             </tr>
           )}

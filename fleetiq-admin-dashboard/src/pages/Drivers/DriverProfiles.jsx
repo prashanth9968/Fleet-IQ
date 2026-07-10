@@ -10,20 +10,16 @@ export const DriverProfiles = () => {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
 
-  // Mock trend data for safety scores
-  const scoreTrend = [
-    { week: 'W1', score: 85 },
-    { week: 'W2', score: 89 },
-    { week: 'W3', score: 88 },
-    { week: 'W4', score: 92.5 }
-  ];
-
   useEffect(() => {
     const loadDrivers = async () => {
-      const data = await fetchService('driver', 'drivers');
-      setDrivers(data || []);
-      if (data && data.length > 0) {
-        setSelectedDriver(data[0]);
+      try {
+        const data = await fetchService('driver', 'drivers');
+        setDrivers(data || []);
+        if (data && data.length > 0) {
+          setSelectedDriver(data[0]);
+        }
+      } catch (err) {
+        console.error("Failed to load drivers", err);
       }
     };
     loadDrivers();
@@ -41,7 +37,9 @@ export const DriverProfiles = () => {
         <div style={{ width: '350px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: '600' }}>Fleet Operators</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {drivers.map(d => (
+            {drivers.length === 0 ? (
+              <div style={{ color: 'var(--text-tertiary)', fontSize: '14px', fontStyle: 'italic' }}>No drivers found.</div>
+            ) : drivers.map(d => (
               <div
                 key={d.id}
                 className="card"
@@ -55,15 +53,17 @@ export const DriverProfiles = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.firstName} {d.lastName}</span>
-                  <span style={{
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    color: d.safetyScore >= 90 ? 'var(--success)' : 'var(--warning)'
-                  }}>{d.safetyScore}%</span>
+                  {d.safetyScore !== undefined && (
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: d.safetyScore >= 90 ? 'var(--success)' : 'var(--warning)'
+                    }}>{d.safetyScore}%</span>
+                  )}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                  <span>ID: {d.employeeId}</span>
-                  <span>{d.status}</span>
+                  <span>ID: {d.employeeId || 'N/A'}</span>
+                  <span>{d.status || 'ACTIVE'}</span>
                 </div>
               </div>
             ))}
@@ -82,18 +82,20 @@ export const DriverProfiles = () => {
                     height: '100px',
                     borderRadius: '50%',
                     border: '8px solid var(--bg-tertiary)',
-                    borderTopColor: selectedDriver.safetyScore >= 90 ? 'var(--success)' : 'var(--warning)',
+                    borderTopColor: selectedDriver.safetyScore ? (selectedDriver.safetyScore >= 90 ? 'var(--success)' : 'var(--warning)') : 'var(--border-color)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '22px',
                     fontWeight: '700',
-                    color: 'var(--text-primary)',
+                    color: selectedDriver.safetyScore ? 'var(--text-primary)' : 'var(--text-tertiary)',
                     marginBottom: '8px'
                   }}>
-                    {selectedDriver.safetyScore}%
+                    {selectedDriver.safetyScore ? `${selectedDriver.safetyScore}%` : 'N/A'}
                   </div>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Safety Score</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', textAlign: 'center' }}>
+                    {selectedDriver.safetyScore ? 'Safety Score' : 'Waiting for telemetry...'}
+                  </span>
                 </div>
 
                 {/* Right Details Grid */}
@@ -102,7 +104,7 @@ export const DriverProfiles = () => {
                     <Truck size={18} style={{ color: 'var(--accent)' }} />
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Current Vehicle</div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>KA-01-MJ-1024</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{selectedDriver.currentVehicleReg || 'Not Assigned'}</div>
                     </div>
                   </div>
                   
@@ -110,7 +112,7 @@ export const DriverProfiles = () => {
                     <MapPin size={18} style={{ color: 'var(--accent)' }} />
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Current Location</div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Bangalore City</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{selectedDriver.currentLocation || 'Unknown'}</div>
                     </div>
                   </div>
 
@@ -118,7 +120,7 @@ export const DriverProfiles = () => {
                     <Shield size={18} style={{ color: 'var(--success)' }} />
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>License Expiry</div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{selectedDriver.licenseExpiry}</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{selectedDriver.licenseExpiry || 'N/A'}</div>
                     </div>
                   </div>
 
@@ -126,7 +128,9 @@ export const DriverProfiles = () => {
                     <Activity size={18} style={{ color: 'var(--accent)' }} />
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Total Trips</div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>24 Trips</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                        {selectedDriver.totalTrips !== undefined ? `${selectedDriver.totalTrips} Trips` : 'No historical data yet'}
+                      </div>
                     </div>
                   </div>
 
@@ -134,7 +138,9 @@ export const DriverProfiles = () => {
                     <AlertTriangle size={18} style={{ color: 'var(--warning)' }} />
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Violations</div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>2 Active</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                        {selectedDriver.activeViolations !== undefined ? `${selectedDriver.activeViolations} Active` : 'No violations detected'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -144,35 +150,44 @@ export const DriverProfiles = () => {
             <div className="grid grid-cols-2">
               {/* Score Trend Recharts LineChart */}
               <Card title="Safety Score Trend">
-                <div style={{ width: '100%', height: '220px', marginTop: '16px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={scoreTrend}>
-                      <XAxis dataKey="week" stroke="var(--text-tertiary)" fontSize={11} />
-                      <YAxis domain={[70, 100]} stroke="var(--text-tertiary)" fontSize={11} />
-                      <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
-                      <Line type="monotone" dataKey="score" stroke="var(--accent)" strokeWidth={2.5} activeDot={{ r: 6 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                <div style={{ width: '100%', height: '220px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {selectedDriver.scoreTrend && selectedDriver.scoreTrend.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={selectedDriver.scoreTrend}>
+                        <XAxis dataKey="week" stroke="var(--text-tertiary)" fontSize={11} />
+                        <YAxis domain={[70, 100]} stroke="var(--text-tertiary)" fontSize={11} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
+                        <Line type="monotone" dataKey="score" stroke="var(--accent)" strokeWidth={2.5} activeDot={{ r: 6 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div style={{ color: 'var(--text-tertiary)', fontSize: '14px', fontStyle: 'italic' }}>
+                      Waiting for telemetry...
+                    </div>
+                  )}
                 </div>
               </Card>
 
               {/* Driving Violations logs */}
               <Card title="Recent Safety Violations">
-                <Table
-                  headers={['Timestamp', 'Event Type', 'Speed recorded', 'Score Impact']}
-                  data={[
-                    { time: '12:00', type: 'SPEEDING', speed: '95 km/h (limit 80)', impact: '-5.0' },
-                    { time: '10:45', type: 'HARSH_BRAKING', speed: 'G-Force 1.2g', impact: '-3.0' }
-                  ]}
-                  renderRow={(item, idx) => (
-                    <tr key={idx}>
-                      <td style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>{item.time}</td>
-                      <td><code style={{ fontSize: '12px', color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', padding: '2px 6px', borderRadius: '4px' }}>{item.type}</code></td>
-                      <td style={{ fontSize: '13px' }}>{item.speed}</td>
-                      <td style={{ color: 'var(--danger)', fontWeight: '600' }}>{item.impact}</td>
-                    </tr>
-                  )}
-                />
+                {selectedDriver.recentViolations && selectedDriver.recentViolations.length > 0 ? (
+                  <Table
+                    headers={['Timestamp', 'Event Type', 'Speed recorded', 'Score Impact']}
+                    data={selectedDriver.recentViolations}
+                    renderRow={(item, idx) => (
+                      <tr key={idx}>
+                        <td style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>{item.time}</td>
+                        <td><code style={{ fontSize: '12px', color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', padding: '2px 6px', borderRadius: '4px' }}>{item.type}</code></td>
+                        <td style={{ fontSize: '13px' }}>{item.speed}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '600' }}>{item.impact}</td>
+                      </tr>
+                    )}
+                  />
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-tertiary)', fontSize: '14px', fontStyle: 'italic' }}>
+                    No recent safety violations recorded.
+                  </div>
+                )}
               </Card>
             </div>
           </div>
