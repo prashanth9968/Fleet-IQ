@@ -62,16 +62,16 @@ public class Vehicle {
     @Column(name = "engine_hours", precision = 10, scale = 2)
     private BigDecimal engineHours = BigDecimal.ZERO;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double latitude;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double longitude;
 
-    @Column(name = "speed_kmh", precision = 5, scale = 2)
+    @Column(name = "speed_kmh")
     private Double speedKmh;
 
-    @Column(precision = 5, scale = 2)
+    @Column
     private Double heading;
 
     @Column(nullable = false)
